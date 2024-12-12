@@ -1,4 +1,12 @@
 import express from "express";
+import {
+  query,
+  validationResult,
+  body,
+  matchedData,
+  checkSchema,
+} from "express-validator";
+import { createUserValidationSchema } from "./utils/validationSchemas.mjs";
 
 const app = express();
 
@@ -63,30 +71,50 @@ app.get(
   }
 );
 
-app.get("/api/users", loggingMiddleware, (request, response) => {
-  console.log(request.query);
-  const {
-    query: { filter, value },
-  } = request;
-  let filteredUsers = [...mockUsers];
-  if (filter && value) {
-    return response.send(
-      filteredUsers.filter((user) =>
-        user[filter].toLowerCase().includes(value.toLowerCase())
-      )
-    );
+app.get(
+  "/api/users",
+  query("filter")
+    .isString()
+    .withMessage("Filter must be a string")
+    .notEmpty()
+    .withMessage("Filter must not be empty")
+    .isLength({ min: 3, max: 10 })
+    .withMessage("Filter must be between 3 and 10 characters long"),
+  loggingMiddleware,
+  (request, response) => {
+    const result = validationResult(request);
+    console.log(result);
+    const {
+      query: { filter, value },
+    } = request;
+    let filteredUsers = [...mockUsers];
+    if (filter && value) {
+      return response.send(
+        filteredUsers.filter((user) =>
+          user[filter].toLowerCase().includes(value.toLowerCase())
+        )
+      );
+    }
+    return response.status(200).send(mockUsers);
   }
-  return response.status(200).send(mockUsers);
-});
+);
 
 // POST: create a new user
-app.post("/api/users", (request, response) => {
-  console.log(request.body);
-  const { body } = request;
-  const newUser = { id: mockUsers.length + 1, ...body };
-  mockUsers.push(newUser);
-  return response.status(201).send(newUser);
-});
+app.post(
+  "/api/users",
+  checkSchema(createUserValidationSchema),
+  (request, response) => {
+    const result = validationResult(request);
+    console.log(result);
+    if (!result.isEmpty()) {
+      return response.status(400).send({ errors: result.array() });
+    }
+    const data = matchedData(request); // 如果body里有多的filed，会自动去除，只返回验证过的field
+    const newUser = { id: mockUsers.length + 1, ...data };
+    mockUsers.push(newUser);
+    return response.status(201).send(newUser);
+  }
+);
 
 app.get("/api/users/:id", resolveIndexByUserId, (request, response) => {
   const { findUserIndex } = request;
