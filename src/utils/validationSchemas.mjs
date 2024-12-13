@@ -1,7 +1,7 @@
 export const createUserValidationSchema = {
   username: {
     isLength: {
-      option: { min: 3, max: 10 },
+      options: { min: 3, max: 10 },
       errorMessage: "Name must be between 3 and 10 characters",
     },
     notEmpty: {
