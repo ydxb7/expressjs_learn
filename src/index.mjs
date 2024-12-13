@@ -1,9 +1,11 @@
 import express from "express";
 import routers from "./routes/index.mjs";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser("hello-world-secret-key"));
 app.use(routers);
 
 const PORT = process.env.PORT || 3000;
@@ -27,6 +29,7 @@ app.get(
     next();
   },
   (request, response) => {
+    response.cookie("hello", "world", { maxAge: 60000 * 60 * 2, signed: true });
     response.status(201).send({ msg: "Hello!" });
   }
 );
