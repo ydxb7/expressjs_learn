@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { mockUsers } from "../utils/constants.mjs";
+import passport from "passport";
 
 const router = Router();
 
@@ -11,27 +12,56 @@ router.get("/", (request, response) => {
   response.status(201).send({ msg: "Hello!" });
 });
 
-router.post("/api/auth", (request, response) => {
-  console.log(request.session);
-  console.log(request.session.id);
-  const { username, password } = request.body;
-  const findUser = mockUsers.find((user) => user.username === username);
-  if (!findUser || findUser.password !== password)
-    return response.status(401).send({ error: "Invalid credentials" });
+//----------- use session to authenticate the user: --------------------------
+// router.post("/api/auth", (request, response) => {
+//   console.log(request.session);
+//   console.log(request.session.id);
+//   const { username, password } = request.body;
+//   const findUser = mockUsers.find((user) => user.username === username);
+//   if (!findUser || findUser.password !== password)
+//     return response.status(401).send({ error: "Invalid credentials" });
 
-  request.session.user = findUser;
-  return response.status(200).send(findUser);
-});
+//   request.session.user = findUser;
+//   return response.status(200).send(findUser);
+// });
+
+// router.get("/api/auth/status", (request, response) => {
+//   console.log("request.sessionID:" + request.sessionID);
+//   request.sessionStore.get(request.sessionID, (error, sessionData) => {
+//     console.log("request.sessionStore.get");
+//     console.log(sessionData);
+//   });
+//   return request.session.user
+//     ? response.status(200).send(request.session.user)
+//     : response.status(401).send({ msg: "Unauthorized" });
+// });
+
+//----------- use passport to authenticate the user: --------------------------
+router.post(
+  "/api/auth",
+  passport.authenticate("local"),
+  (request, response) => {
+    response.sendStatus(200);
+  }
+);
 
 router.get("/api/auth/status", (request, response) => {
-  console.log("request.sessionID:" + request.sessionID);
-  request.sessionStore.get(request.sessionID, (error, sessionData) => {
-    console.log("request.sessionStore.get");
-    console.log(sessionData);
-  });
-  return request.session.user
-    ? response.status(200).send(request.session.user)
+  console.log("request.user:");
+  console.log(request.user);
+  console.log(request.session);
+  return request.user
+    ? response.status(200).send(request.user)
     : response.status(401).send({ msg: "Unauthorized" });
+});
+
+router.get("/api/auth/logout", (request, response) => {
+  if (!request.user) {
+    return response.sendStatus(401);
+  }
+  request.logout((err) => {
+    if (err) return response.sendStatus(400);
+    response.sendStatus(200);
+  });
 });
 
 router.post("/api/cart", (request, response) => {
