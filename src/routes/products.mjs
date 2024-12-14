@@ -7,6 +7,15 @@ router.get("/api/products", (request, response) => {
   console.log(request.cookies);
   console.log(request.signedCookies);
   console.log(request.signedCookies.hello);
+  console.log(request.session);
+  console.log(request.session.id);
+  request.sessionStore.get(request.sessionID, (error, sessionData) => {
+    if (error) {
+      console.error(error);
+      throw error;
+    }
+    console.log(sessionData);
+  });
   if (request.signedCookies.hello && request.signedCookies.hello === "world") {
     return response.send([{ id: 1, name: "chicken breast", price: 10.99 }]);
   }
