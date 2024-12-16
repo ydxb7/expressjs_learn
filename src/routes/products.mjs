@@ -3,17 +3,18 @@ import { Router } from "express";
 const router = Router();
 
 router.get("/api/products", (request, response) => {
-  console.log(request.headers.cookie);
-  console.log(request.cookies);
-  console.log(request.signedCookies);
-  console.log(request.signedCookies.hello);
-  console.log(request.session);
-  console.log(request.session.id);
+  console.log("request.headers.cookie: ", request.headers.cookie);
+  console.log("request.cookies: ", request.cookies);
+  console.log("request.signedCookies: ", request.signedCookies);
+  console.log("request.signedCookies.hello: ", request.signedCookies.hello);
+  console.log("request.session: ", request.session);
+  console.log("request.session.id: " + request.session.id);
   request.sessionStore.get(request.sessionID, (error, sessionData) => {
     if (error) {
       console.error(error);
       throw error;
     }
+    console.log("sessionData:");
     console.log(sessionData);
   });
   if (request.signedCookies.hello && request.signedCookies.hello === "world") {

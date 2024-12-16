@@ -6,6 +6,8 @@ import { mockUsers } from "./utils/constants.mjs";
 import passport from "passport";
 import mongoose from "mongoose";
 import "./strategies/local-strategy.mjs";
+import { loggingMiddleware } from "./utils/middlewares.mjs";
+import MongoStore from "connect-mongo";
 
 const app = express();
 
@@ -24,8 +26,12 @@ app.use(
     cookie: {
       maxAge: 60000 * 60 * 2, // 2 hours, how long the cookie will live in milliseconds
     },
+    store: MongoStore.create({
+      client: mongoose.connection.getClient(),
+    }),
   })
 );
+app.use(loggingMiddleware);
 
 // after session middleware and before routes
 passport.use(passport.initialize());

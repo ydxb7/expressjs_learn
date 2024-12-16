@@ -1,5 +1,10 @@
 export const loggingMiddleware = (request, response, next) => {
-  console.log(`Method: ${request.method}, URL: ${request.url}`);
+  console.log(
+    "------------------ Request:",
+    request.method,
+    request.url,
+    "-------------------"
+  );
   next();
 };
 

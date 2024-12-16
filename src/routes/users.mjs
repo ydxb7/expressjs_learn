@@ -26,8 +26,16 @@ router.get(
     .withMessage("Filter must not be empty")
     .isLength({ min: 3, max: 10 })
     .withMessage("Filter must be between 3 and 10 characters long"),
-  loggingMiddleware,
   (request, response) => {
+    console.log("request.session.id: ", request.session.id);
+    request.sessionStore.get(request.sessionID, (error, sessionData) => {
+      if (error) {
+        console.error("Error getting session data:", error);
+        throw error;
+      }
+      console.log("sessionData:", sessionData);
+    });
+  
     const result = validationResult(request);
     console.log(result);
     const {
