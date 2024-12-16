@@ -13,6 +13,7 @@ import {
   resolveIndexByUserId,
 } from "../utils/middlewares.mjs";
 import { User } from "../mongoose/schemas/user.mjs";
+import { hashPassword } from "../utils/helper.mjs";
 
 const router = Router();
 
@@ -77,6 +78,7 @@ router.post(
       return response.status(400).send({ errors: result.array() });
     }
     const data = matchedData(request);
+    data.password = hashPassword(data.password); // 加密密码
     const newUser = new User(data);
     try {
       const savedUser = await newUser.save();
