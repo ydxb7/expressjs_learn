@@ -5,7 +5,8 @@ import session from "express-session";
 import { mockUsers } from "./utils/constants.mjs";
 import passport from "passport";
 import mongoose from "mongoose";
-import "./strategies/local-strategy.mjs";
+// import "./strategies/local-strategy.mjs";
+import "./strategies/google-strategy.mjs";
 import { loggingMiddleware } from "./utils/middlewares.mjs";
 import MongoStore from "connect-mongo";
 
@@ -44,3 +45,14 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+// OAUTH2.0 Google Authentication
+app.get("/api/auth/google", passport.authenticate("google"));
+app.get(
+  "/api/auth/google/redirect",
+  passport.authenticate("google"),
+  (request, response) => {
+    // response.redirect("/");
+    response.sendStatus(200);
+  }
+);
