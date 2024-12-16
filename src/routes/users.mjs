@@ -12,6 +12,7 @@ import {
   loggingMiddleware,
   resolveIndexByUserId,
 } from "../utils/middlewares.mjs";
+import { User } from "../mongoose/schemas/user.mjs";
 
 const router = Router();
 
@@ -51,19 +52,39 @@ router.get("/api/users/:id", resolveIndexByUserId, (request, response) => {
 });
 
 // POST: create a new user
+// router.post(
+//   "/api/users",
+//   checkSchema(createUserValidationSchema),
+//   (request, response) => {
+//     const result = validationResult(request);
+//     console.log(result);
+//     if (!result.isEmpty()) {
+//       return response.status(400).send({ errors: result.array() });
+//     }
+//     const data = matchedData(request); // 如果body里有多的filed，会自动去除，只返回验证过的field
+//     const newUser = { id: mockUsers.length + 1, ...data };
+//     mockUsers.push(newUser);
+//     return response.status(201).send(newUser);
+//   }
+// );
+
 router.post(
   "/api/users",
   checkSchema(createUserValidationSchema),
-  (request, response) => {
+  async (request, response) => {
     const result = validationResult(request);
-    console.log(result);
     if (!result.isEmpty()) {
       return response.status(400).send({ errors: result.array() });
     }
-    const data = matchedData(request); // 如果body里有多的filed，会自动去除，只返回验证过的field
-    const newUser = { id: mockUsers.length + 1, ...data };
-    mockUsers.push(newUser);
-    return response.status(201).send(newUser);
+    const data = matchedData(request);
+    const newUser = new User(data);
+    try {
+      const savedUser = await newUser.save();
+      return response.status(201).send(savedUser);
+    } catch (err) {
+      console.error("error1" + err);
+      return response.status(400).send(err);
+    }
   }
 );
 

@@ -4,9 +4,15 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import { mockUsers } from "./utils/constants.mjs";
 import passport from "passport";
+import mongoose from "mongoose";
 import "./strategies/local-strategy.mjs";
 
 const app = express();
+
+mongoose
+  .connect("mongodb://localhost:27017/express_learn")
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((error) => console.error("Error connecting to MongoDB:", error));
 
 app.use(express.json());
 app.use(cookieParser("hello-world-secret-key"));
