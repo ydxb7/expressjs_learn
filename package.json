@@ -13,6 +13,7 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.7",
     "express": "^4.21.2",
@@ -26,5 +27,13 @@
   "devDependencies": {
     "nodemon": "^3.1.7"
   },
-  "type": "module"
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ydxb7/expressjs_learn.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ydxb7/expressjs_learn/issues"
+  },
+  "homepage": "https://github.com/ydxb7/expressjs_learn#readme"
 }
